@@ -7,7 +7,7 @@ interface PredictPanelProps {
   logic: string;
 }
 
-const PredictPanel = ({ symbol, trend, confidence, logic }: PredictPanelProps) => {
+const PredictPanel = ({ trend, confidence, logic }: PredictPanelProps) => {
   const getTrendConfig = () => {
     switch (trend) {
       case 'bullish':

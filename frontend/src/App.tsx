@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  TrendingUp, TrendingDown, Activity, 
-  Search, Bell, Settings, PieChart, 
-  Cpu, Newspaper, RefreshCw, ChevronRight
+  Activity, 
+  Bell, Settings, 
+  Cpu, Newspaper, RefreshCw
 } from 'lucide-react';
 import { fetchPrediction, fetchMarketPrices, fetchNews, fetchMarketHistory } from './services/api';
 import type { PredictionResult, MarketData, NewsItem as NewsType } from './services/api';
@@ -20,7 +20,6 @@ function App() {
   const [priceHistory, setPriceHistory] = useState<{time: string, price: number}[]>([]);
   const [news, setNews] = useState<NewsType[]>([]);
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
-  const [loading, setLoading] = useState(true);
   const [loadingPredict, setLoadingPredict] = useState(false);
 
   const loadMarket = async () => {
