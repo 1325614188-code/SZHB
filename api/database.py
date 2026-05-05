@@ -27,13 +27,14 @@ if DATABASE_URL:
     elif DATABASE_URL.startswith("postgresql://"):
         DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-# 创建异步数据库引擎，针对 Vercel 环境优化
+# 创建异步数据库引擎，针对 Vercel + Supabase PgBouncer 优化
 engine = create_async_engine(
     DATABASE_URL,
-    pool_pre_ping=True,  # 每次连接前检查连通性
-    pool_recycle=300,    # 5分钟回收连接，防止被断开
+    pool_pre_ping=True,
+    pool_recycle=300,
     connect_args={
         "command_timeout": 5,
+        "statement_cache_size": 0,  # 必须设置为 0，否则无法兼容 Supabase 的连接池 (PgBouncer)
         "server_settings": {
             "application_name": "crypto_insight_vercel"
         }
