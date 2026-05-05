@@ -51,9 +51,15 @@ AsyncSessionLocal = async_sessionmaker(
     expire_on_commit=False
 )
 
-# 基类
-class Base(DeclarativeBase):
-    pass
+import sys
+
+# 内存单例：防止 Vercel 路径混乱导致的多次加载
+if 'api_base_instance' not in sys.modules:
+    class Base(DeclarativeBase):
+        pass
+    sys.modules['api_base_instance'] = Base
+else:
+    Base = sys.modules['api_base_instance']
 
 async def init_db():
     """
