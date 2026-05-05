@@ -101,10 +101,13 @@ async def get_news_with_analysis(symbol: str, db: AsyncSession) -> List[NewsItem
     if all_fetched_news:
         await repo.add_news_items(all_fetched_news, symbol)
     
-    # 3. 无论数据库如何，我们本次直接返回抓取到的最新数据，确保用户 100% 看到内容
-    # 异步在后台存入数据库的操作已经在上面执行了
+    # 3. 无论数据库如何，我们本次直接返回抓取到的最新数据
+    print(f"DEBUG: All fetched news count: {len(all_fetched_news)}")
+    
     if all_fetched_news:
         # 为了保证类型一致，我们可以简单处理一下
         return all_fetched_news[:10]
     
+    # 兜底：如果实在没有，再返回一个空
+    print("DEBUG: Returning empty list because all_fetched_news is empty")
     return []
