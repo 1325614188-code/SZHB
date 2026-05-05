@@ -7,8 +7,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 优先从环境变量读取数据库连接字符串
-# 格式: postgresql+asyncpg://postgres:password@db.xxx.supabase.co:5432/postgres
 DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.strip()
 
 # 如果没有配置环境变量，默认使用 SQLite (仅用于本地兜底)
 if not DATABASE_URL:
