@@ -15,18 +15,18 @@ const PriceChart = ({ data, symbol }: PriceChartProps) => {
   }
 
   return (
-    <div className="w-full h-full p-2">
-      <div className="flex justify-between items-center mb-6">
+    <div className="w-full h-full p-2" style={{ minHeight: '320px' }}>
+      <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-black uppercase tracking-tighter">{symbol} Trend (7D)</h3>
         <span className="text-[10px] text-accent-primary font-bold">USD / USDT</span>
       </div>
-      <div style={{ width: '100%', height: 'calc(100% - 40px)' }}>
+      <div style={{ width: '100%', height: '280px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.2}/>
-                <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#00f2ff" stopOpacity={0}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
@@ -58,7 +58,7 @@ const PriceChart = ({ data, symbol }: PriceChartProps) => {
             <Area 
               type="monotone" 
               dataKey="price" 
-              stroke="var(--accent-primary)" 
+              stroke="#00f2ff" 
               strokeWidth={2}
               fillOpacity={1} 
               fill="url(#colorPrice)" 
