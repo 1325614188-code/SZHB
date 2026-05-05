@@ -9,18 +9,21 @@ if current_dir not in sys.path:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# 尝试导入路由，如果失败则尝试相对导入
+# 导入具体的 API 路由
 try:
-    from api.predict import router as predict_router
     from api.market import router as market_router
     from api.news import router as news_router
-    from database import init_db
+    from api.predict import router as predict_router
+    from database import init_db, get_db
 except ImportError:
-    from .api.predict import router as predict_router
+    # 兼容 Vercel 的不同部署环境
     from .api.market import router as market_router
     from .api.news import router as news_router
-    from .database import init_db
+    from .api.predict import router as predict_router
+    from .database import init_db, get_db
 
 from contextlib import asynccontextmanager
 
