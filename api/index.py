@@ -48,6 +48,18 @@ app.include_router(predict_router)
 app.include_router(market_router)
 app.include_router(news_router)
 
+@app.get("/api/debug/db")
+async def debug_db(db: AsyncSession = Depends(get_db)):
+    """
+    调试接口：检查数据库连通性
+    """
+    try:
+        from sqlalchemy import text
+        result = await db.execute(text("SELECT 1"))
+        return {"status": "success", "message": "Database connection is working!", "data": result.fetchone()[0]}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/api/debug/news")
 async def debug_news():
     """
