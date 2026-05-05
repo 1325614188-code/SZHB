@@ -54,12 +54,25 @@ app.include_router(news_router)
 @app.get("/api/debug/db")
 async def debug_db(db: AsyncSession = Depends(get_db)):
     """
-    调试接口：检查数据库连通性
+    调试接口：检查数据库连通性及表状态
     """
     try:
         from sqlalchemy import text
-        result = await db.execute(text("SELECT 1"))
-        return {"status": "success", "message": "Database connection is working!", "data": result.fetchone()[0]}
+        # 1. 检查连通性
+        await db.execute(text("SELECT 1"))
+        
+        # 2. 检查表是否存在及数量
+        news_count = await db.execute(text("SELECT count(*) FROM news"))
+        predict_count = await db.execute(text("SELECT count(*) FROM predictions"))
+        
+        return {
+            "status": "success",
+            "message": "Connected!",
+            "tables": {
+                "news": news_count.scalar(),
+                "predictions": predict_count.scalar()
+            }
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

@@ -104,7 +104,11 @@ async def get_news_with_analysis(symbol: str, db: AsyncSession) -> List[NewsItem
     # 3. 从数据库获取最新新闻
     db_news = await repo.get_news_by_symbol(symbol, limit=10)
     
-    # 4. 对新闻进行封装，限制 AI 分析的数量（每秒最多分析 2 条）
+    # 如果数据库里还没数据（比如正在写入），则直接返回本次抓取的数据，确保页面不空
+    if not db_news:
+        return all_fetched_news
+        
+    # 4. 对新闻进行封装...
     news_items = []
     analysis_count = 0
     for row in db_news:
