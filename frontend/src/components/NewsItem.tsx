@@ -1,4 +1,4 @@
-import { ExternalLink, Tag } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 interface NewsItemProps {
   title: string;
@@ -11,9 +11,9 @@ interface NewsItemProps {
 const NewsItem = ({ title, source, time, url, sentiment }: NewsItemProps) => {
   const getSentimentColor = () => {
     switch (sentiment) {
-      case 'positive': return 'var(--success)';
-      case 'negative': return 'var(--danger)';
-      default: return 'var(--text-secondary)';
+      case 'positive': return 'var(--up)';
+      case 'negative': return 'var(--down)';
+      default: return 'var(--text-muted)';
     }
   };
 
@@ -22,61 +22,27 @@ const NewsItem = ({ title, source, time, url, sentiment }: NewsItemProps) => {
       href={url} 
       target="_blank" 
       rel="noopener noreferrer" 
-      className="glass-card" 
-      style={{ 
-        padding: '16px', 
-        display: 'block', 
-        textDecoration: 'none', 
-        color: 'inherit',
-        borderRadius: '16px'
-      }}
+      className="news-item-compact group"
+      style={{ textDecoration: 'none' }}
     >
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-        <div style={{ 
-          fontSize: '0.7rem', 
-          fontWeight: 700, 
-          padding: '2px 8px', 
-          borderRadius: '4px', 
-          background: 'rgba(255,255,255,0.05)',
-          color: 'var(--text-secondary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}>
-          <Tag size={10} />
-          {source}
-        </div>
-        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6, marginTop: '2px' }}>
-          {time}
-        </div>
+      <div className="flex justify-between items-center mb-1">
+        <span className="news-source">{source}</span>
+        <span className="text-[10px] text-muted opacity-60">{time}</span>
       </div>
       
-      <h4 style={{ 
-        fontSize: '1rem', 
-        fontWeight: 600, 
-        lineHeight: '1.4', 
-        marginBottom: '12px',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
+      <h4 className="news-title-compact group-hover:text-accent-primary transition-colors">
         {title}
       </h4>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ 
-            width: '8px', 
-            height: '8px', 
-            borderRadius: '50%', 
-            background: getSentimentColor() 
-          }}></div>
-          <span style={{ fontSize: '0.75rem', color: getSentimentColor(), fontWeight: 600 }}>
-            {sentiment === 'positive' ? '利好' : sentiment === 'negative' ? '利空' : '中性'}
-          </span>
-        </div>
-        <ExternalLink size={14} color="var(--text-secondary)" />
+      <div className="flex items-center gap-2 mt-2">
+        <div 
+          className="w-1.5 h-1.5 rounded-full" 
+          style={{ background: getSentimentColor() }}
+        />
+        <span className="text-[10px] font-bold tracking-tighter" style={{ color: getSentimentColor() }}>
+          {sentiment === 'positive' ? 'BULLISH' : sentiment === 'negative' ? 'BEARISH' : 'NEUTRAL'}
+        </span>
+        <ExternalLink size={10} className="ml-auto text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </a>
   );
