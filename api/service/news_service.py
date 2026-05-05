@@ -41,20 +41,17 @@ async def fetch_rss_feed(source_name: str, url: str, symbol: str) -> List[NewsIt
             title = entry.get("title", "")
             summary = entry.get("summary", entry.get("description", ""))
             
-            content_text = (title + summary).lower()
-            # 如果源本身就是加密货币相关的，或者包含了关键词，就认为相关
-            if any(kw in content_text for kw in keywords) or source_name in ["CoinDesk", "Cointelegraph"]:
-                # 清理 HTML 标签
-                clean_summary = re.sub('<[^<]+?>', '', summary)
-                items.append(NewsItem(
-                    id=str(uuid.uuid4()),
-                    title=title,
-                    content=clean_summary[:300],
-                    source=source_name,
-                    url=entry.get("link", ""),
-                    published_at=entry.get("published", datetime.now().isoformat()),
-                    sentiment="neutral"
-                ))
+            # 暂时取消关键词过滤，只要有新闻就显示，确保侧边栏不为空
+            clean_summary = re.sub('<[^<]+?>', '', summary)
+            items.append(NewsItem(
+                id=str(uuid.uuid4()),
+                title=title,
+                content=clean_summary[:300],
+                source=source_name,
+                url=entry.get("link", ""),
+                published_at=entry.get("published", datetime.now().isoformat()),
+                sentiment="neutral"
+            ))
         return items
     except Exception as e:
         print(f"Error fetching RSS from {source_name}: {e}")

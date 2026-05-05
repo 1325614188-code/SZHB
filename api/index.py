@@ -48,6 +48,29 @@ app.include_router(predict_router)
 app.include_router(market_router)
 app.include_router(news_router)
 
+@app.get("/api/debug/news")
+async def debug_news():
+    """
+    调试接口：检查 RSS 源的连通性
+    """
+    import feedparser
+    import asyncio
+    from service.news_service import RSS_SOURCES
+    
+    debug_info = {}
+    for src in RSS_SOURCES:
+        try:
+            feed = await asyncio.to_thread(feedparser.parse, src["url"])
+            debug_info[src["name"]] = {
+                "status": "success",
+                "entries_count": len(feed.entries),
+                "first_title": feed.entries[0].get("title") if feed.entries else "None"
+            }
+        except Exception as e:
+            debug_info[src["name"]] = {"status": "error", "message": str(e)}
+    
+    return debug_info
+
 @app.get("/")
 async def root():
     return {"message": "Crypto Insight API is running"}
