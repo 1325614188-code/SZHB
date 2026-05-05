@@ -19,29 +19,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 async def fetch_rss_feed(source_name: str, url: str, symbol: str) -> List[NewsItem]:
     """
-    异步抓取并解析单个 RSS 源，使用 feedparser 原生抓取以提高兼容性
+    异步抓取并解析单个 RSS 源，使用 urllib + User-Agent 绕过 Vercel 网络限制
     """
     try:
-        # 在线程池中执行同步的 feedparser 抓取
-        # feedparser 内部处理了 User-Agent 和基本的重定向
-        feed = await asyncio.to_thread(feedparser.parse, url)
+        from urllib.request import Request, urlopen
+        import ssl
+        
+        # 伪装成真实浏览器，绕过 WAF
+        req = Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        })
+        
+        # 忽略 SSL 证书错误（由于某些节点证书不全）
+        context = ssl._create_unverified_context()
+        
+        # 在线程池中执行同步抓取，设置 5 秒超时
+        def do_fetch():
+            with urlopen(req, context=context, timeout=5) as response:
+                return response.read()
+        
+        content = await asyncio.to_thread(do_fetch)
+        feed = await asyncio.to_thread(feedparser.parse, content)
         
         if not feed.entries:
-            print(f"No entries found for {source_name}")
             return []
 
         items = []
-        keywords = [symbol.lower(), "crypto", "blockchain", "market", "web3"]
-        if symbol.lower() == "btc":
-            keywords.extend(["bitcoin", "btc"])
-        elif symbol.lower() == "eth":
-            keywords.extend(["ethereum", "eth"])
-
         for entry in feed.entries[:5]:
             title = entry.get("title", "")
             summary = entry.get("summary", entry.get("description", ""))
-            
-            # 暂时取消关键词过滤，只要有新闻就显示，确保侧边栏不为空
             clean_summary = re.sub('<[^<]+?>', '', summary)
             items.append(NewsItem(
                 id=str(uuid.uuid4()),
@@ -54,7 +60,7 @@ async def fetch_rss_feed(source_name: str, url: str, symbol: str) -> List[NewsIt
             ))
         return items
     except Exception as e:
-        print(f"Error fetching RSS from {source_name}: {e}")
+        print(f"Fetch Error from {source_name}: {e}")
         return []
 
 async def get_news_with_analysis(symbol: str, db: AsyncSession) -> List[NewsItem]:
