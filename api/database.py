@@ -13,7 +13,14 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # 如果没有配置环境变量，默认使用 SQLite (仅用于本地兜底)
 if not DATABASE_URL:
     DATABASE_URL = "sqlite+aiosqlite:///./crypto_insight.db"
+# 修正数据库 URL 格式并强制使用 asyncpg
 if DATABASE_URL:
+    # 去除 pgbouncer 参数，因为 asyncpg 驱动不直接支持它作为连接参数
+    if "?pgbouncer=true" in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace("?pgbouncer=true", "")
+    elif "&pgbouncer=true" in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace("&pgbouncer=true", "")
+        
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
     elif DATABASE_URL.startswith("postgresql://"):
