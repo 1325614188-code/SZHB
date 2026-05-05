@@ -101,40 +101,10 @@ async def get_news_with_analysis(symbol: str, db: AsyncSession) -> List[NewsItem
     if all_fetched_news:
         await repo.add_news_items(all_fetched_news, symbol)
     
-    # 3. 从数据库获取最新新闻
-    db_news = await repo.get_news_by_symbol(symbol, limit=10)
+    # 3. 无论数据库如何，我们本次直接返回抓取到的最新数据，确保用户 100% 看到内容
+    # 异步在后台存入数据库的操作已经在上面执行了
+    if all_fetched_news:
+        # 为了保证类型一致，我们可以简单处理一下
+        return all_fetched_news[:10]
     
-    # 如果数据库里还没数据（比如正在写入），则直接返回本次抓取的数据，确保页面不空
-    if not db_news:
-        return all_fetched_news
-        
-    # 4. 对新闻进行封装...
-    news_items = []
-    analysis_count = 0
-    for row in db_news:
-        item = NewsItem(
-            id=row.id,
-            title=row.title,
-            content=row.content,
-            source=row.source,
-            url=row.url,
-            published_at=row.published_at,
-            sentiment=row.sentiment
-        )
-        
-        # 限制 AI 分析数量，防止 Vercel 超时
-        if item.sentiment == "neutral" and analysis_count < 2:
-            try:
-                # 给 AI 分析增加超时
-                item.sentiment = await asyncio.wait_for(
-                    analyze_news_sentiment(item.title, item.content),
-                    timeout=5.0
-                )
-                await repo.update_sentiment(item.id, item.sentiment)
-                analysis_count += 1
-            except Exception as e:
-                print(f"AI Analysis failed: {e}")
-            
-        news_items.append(item)
-        
-    return news_items
+    return []
