@@ -7,11 +7,14 @@ interface SentimentGaugeProps {
 }
 
 const SentimentGauge: React.FC<SentimentGaugeProps> = ({ trend, confidence }) => {
+  // Normalize confidence to 0-100
+  const normalizedConfidence = confidence <= 1 ? confidence * 100 : confidence;
+
   const getRotation = () => {
     // -90deg is bearish, 0deg is neutral, 90deg is bullish
     if (trend === 'neutral') return 0;
-    if (trend === 'bullish') return 90 * (confidence / 100);
-    return -90 * (confidence / 100);
+    if (trend === 'bullish') return 90 * (normalizedConfidence / 100);
+    return -90 * (normalizedConfidence / 100);
   };
 
   const getColor = () => {
@@ -49,7 +52,7 @@ const SentimentGauge: React.FC<SentimentGaugeProps> = ({ trend, confidence }) =>
       </div>
 
       <div className="mt-4 text-2xl font-black tracking-tight" style={{ color: getColor() }}>
-        {trend.toUpperCase()} <span className="text-sm font-normal text-muted">({confidence}%)</span>
+        {trend.toUpperCase()} <span className="text-sm font-normal text-muted">({Math.round(normalizedConfidence)}%)</span>
       </div>
     </div>
   );

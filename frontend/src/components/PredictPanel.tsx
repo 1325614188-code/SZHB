@@ -8,6 +8,8 @@ interface PredictPanelProps {
 }
 
 const PredictPanel = ({ trend, confidence, logic }: PredictPanelProps) => {
+  const normalizedConfidence = confidence <= 1 ? confidence * 100 : confidence;
+
   const getTrendConfig = () => {
     switch (trend) {
       case 'bullish':
@@ -38,7 +40,7 @@ const PredictPanel = ({ trend, confidence, logic }: PredictPanelProps) => {
         
         <div className="text-right">
           <div className="text-2xl font-black font-mono" style={{ color: config.color }}>
-            {Math.round(confidence)}%
+            {Math.round(normalizedConfidence)}%
           </div>
           <div className="flex items-center gap-1 justify-end text-[10px] text-muted font-bold">
             <ShieldCheck size={10} />
