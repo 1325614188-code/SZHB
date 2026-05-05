@@ -6,6 +6,14 @@ from dotenv import load_dotenv
 # 加载环境变量
 load_dotenv()
 
+# 必须在这里导入模型，否则 Base.metadata.create_all 找不到表
+try:
+    from model.news import NewsItemDB
+    from model.prediction import PredictionDB
+except ImportError:
+    from .model.news import NewsItemDB
+    from .model.prediction import PredictionDB
+
 # 优先从环境变量读取数据库连接字符串
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
