@@ -51,6 +51,17 @@ app.include_router(predict_router)
 app.include_router(market_router)
 app.include_router(news_router)
 
+@app.get("/api/debug/init")
+async def debug_init():
+    """
+    强制初始化数据库表
+    """
+    try:
+        await init_db()
+        return {"status": "success", "message": "Tables created successfully!"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/api/debug/db")
 async def debug_db(db: AsyncSession = Depends(get_db)):
     """
