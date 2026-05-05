@@ -59,6 +59,14 @@ async def init_db():
     """
     初始化数据库表
     """
+    # 必须在此导入模型，SQLAlchemy 才能识别到表结构
+    try:
+        from model.news import NewsModel
+        from model.prediction import PredictionModel
+    except ImportError:
+        from .model.news import NewsModel
+        from .model.prediction import PredictionModel
+    
     async with engine.begin() as conn:
         # 直接执行建表，MetaData 此时应该已经包含了所有注册的模型
         await conn.run_sync(Base.metadata.create_all)

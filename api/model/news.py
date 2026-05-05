@@ -1,5 +1,8 @@
 from sqlalchemy import Column, String, Text, DateTime
-from database import Base
+try:
+    from database import Base
+except ImportError:
+    from ..database import Base
 from datetime import datetime
 
 class NewsModel(Base):
